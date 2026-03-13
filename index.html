@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FRONTIER OS</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--primary:#6c5ce7;
+--bg:linear-gradient(135deg,#1e3c72,#2a5298);
+--card:rgba(255,255,255,0.95);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+font-family:Poppins;
+height:100vh;
+display:flex;
+background:var(--bg);
+overflow:hidden;
+}
+
+body.dark{
+background:#0a0a12;
+--card:#12121a;
+color:white;
+}
+
+.sidebar{
+width:80px;
+background:rgba(0,0,0,0.25);
+backdrop-filter:blur(20px);
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:20px;
+padding-top:30px;
+}
+
+.side-icon{
+width:50px;
+height:50px;
+border-radius:15px;
+background:rgba(255,255,255,0.15);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+cursor:pointer;
+transition:.3s;
+color:white;
+}
+
+.side-icon:hover{
+background:var(--primary);
+transform:scale(1.1);
+}
+
+.main{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.container{
+background:var(--card);
+padding:40px;
+border-radius:25px;
+width:520px;
+box-shadow:0 40px 80px rgba(0,0,0,0.4);
+text-align:center;
+}
+
+h2{
+margin-bottom:20px;
+letter-spacing:2px;
+}
+
+.search-box{
+position:relative;
+}
+
+.search-box input{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid #ddd;
+font-size:16px;
+outline:none;
+}
+
+.clear-input{
+position:absolute;
+right:12px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
+font-size:14px;
+opacity:.6;
+}
+
+.btn-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:10px;
+}
+
+button{
+padding:14px;
+border:none;
+border-radius:12px;
+font-weight:600;
+background:var(--primary);
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+filter:brightness(1.1);
+}
+
+.history{
+margin-top:25px;
+}
+
+.history-header{
+display:flex;
+justify-content:space-between;
+font-size:12px;
+margin-bottom:10px;
+}
+
+.clear-history{
+font-size:11px;
+background:none;
+border:none;
+color:#ff6b6b;
+cursor:pointer;
+}
+
+.history-list{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+}
+
+.history-item{
+background:rgba(108,92,231,0.15);
+padding:5px 12px;
+border-radius:20px;
+cursor:pointer;
+font-size:13px;
+}
+
+.history-item:hover{
+background:var(--primary);
+color:white;
+}
+
+.widgets{
+display:flex;
+justify-content:center;
+font-family:JetBrains Mono;
+font-size:12px;
+margin-bottom:15px;
+color:var(--primary);
+}
+
+.theme-toggle{
+margin-top:15px;
+font-size:11px;
+cursor:pointer;
+opacity:.6;
+}
+
+@media (max-width: 768px){
+
+.sidebar{
+width:60px;
+}
+
+.side-icon{
+width:40px;
+height:40px;
+font-size:16px;
+}
+
+.container{
+width:90%;
+padding:25px;
+}
+
+.search-box input{
+font-size:14px;
+padding:12px;
+}
+
+button{
+padding:12px;
+font-size:14px;
+}
+
+.history-item{
+font-size:12px;
+padding:4px 10px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="side-icon" onclick="openSite('https://google.com')">🌐</div>
+<div class="side-icon" onclick="openSite('https://youtube.com')">🎬</div>
+<div class="side-icon" onclick="openSite('https://chatgpt.com')">🤖</div>
+<div class="side-icon" onclick="openSite('https://gmail.com')">✉</div>
+<div class="side-icon" onclick="openSite('https://open.spotify.com')">🎵</div>
+
+</div>
+
+<div class="main">
+
+<div class="container">
+
+<div class="widgets">
+<div id="clock">00:00</div>
+</div>
+
+<h2>FRONTIER OS</h2>
+
+<div class="search-box">
+<input id="searchInput" placeholder="Search or enter website...">
+<span class="clear-input" id="clearInput">✖</span>
+</div>
+
+<div class="btn-row">
+<button id="searchBtn">SEARCH</button>
+<button id="voiceBtn">🎤 VOICE</button>
+</div>
+
+<div class="history">
+
+<div class="history-header">
+<span>RECENT SEARCHES</span>
+<button class="clear-history" id="clearHistory">Clear History</button>
+</div>
+
+<div class="history-list" id="historyList"></div>
+
+</div>
+
+<div class="theme-toggle" id="themeToggle">TOGGLE THEME</div>
+
+</div>
+
+</div>
+
+<script>
+
+const $ = id => document.getElementById(id)
+
+function startClock(){
+setInterval(()=>{
+$('clock').innerText=new Date().toLocaleTimeString()
+},1000)
+}
+
+function openSite(url){
+window.open(url,'_blank')
+}
+
+function isURL(q){
+return q.includes('.') && !q.includes(' ')
+}
+
+function performSearch(){
+
+let q=$('searchInput').value.trim()
+
+if(!q) return
+
+saveHistory(q)
+
+if(isURL(q)){
+if(!q.startsWith("http")) q="https://"+q
+window.location.href=q
+}
+else{
+window.location.href="https://www.google.com/search?q="+encodeURIComponent(q)
+}
+
+}
+
+function saveHistory(q){
+
+let h=JSON.parse(localStorage.getItem("f_history")||"[]")
+
+h=[q,...h.filter(x=>x!==q)].slice(0,8)
+
+localStorage.setItem("f_history",JSON.stringify(h))
+
+loadHistory()
+
+}
+
+function loadHistory(){
+
+let h=JSON.parse(localStorage.getItem("f_history")||"[]")
+
+$('historyList').innerHTML=""
+
+h.forEach(item=>{
+
+let el=document.createElement("span")
+el.className="history-item"
+el.innerText=item
+
+el.onclick=()=>{
+$('searchInput').value=item
+performSearch()
+}
+
+$('historyList').appendChild(el)
+
+})
+
+}
+
+function clearHistory(){
+localStorage.removeItem("f_history")
+loadHistory()
+}
+
+function setupVoice(){
+
+let Speech=window.SpeechRecognition||window.webkitSpeechRecognition
+
+if(!Speech){
+alert("Voice not supported")
+return
+}
+
+let rec=new Speech()
+
+rec.onresult=e=>{
+$('searchInput').value=e.results[0][0].transcript
+performSearch()
+}
+
+rec.start()
+
+}
+
+function shortcuts(){
+
+document.addEventListener("keydown",e=>{
+
+if(e.key==="/"){
+e.preventDefault()
+$('searchInput').focus()
+}
+
+if(e.key==="Escape"){
+$('searchInput').value=""
+}
+
+})
+
+}
+
+function theme(){
+
+document.body.classList.toggle("dark")
+
+localStorage.setItem("theme",
+document.body.classList.contains("dark")?"dark":"light")
+
+}
+
+function loadTheme(){
+
+if(localStorage.getItem("theme")==="dark"){
+document.body.classList.add("dark")
+}
+
+}
+
+$('searchBtn').onclick=performSearch
+$('voiceBtn').onclick=setupVoice
+$('clearHistory').onclick=clearHistory
+$('clearInput').onclick=()=>{$('searchInput').value=""}
+$('themeToggle').onclick=theme
+
+$('searchInput').addEventListener("keydown",e=>{
+if(e.key==="Enter") performSearch()
+})
+
+startClock()
+loadHistory()
+shortcuts()
+loadTheme()
+
+</script>
+
+</body>
+</html>
